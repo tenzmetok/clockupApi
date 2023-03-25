@@ -1,0 +1,41 @@
+import { getDetailsReport } from '../../controllers/detailsReport';
+
+export const resolvers = {
+  Query: {
+    getDetailsReport: async (parent, args, ctx, info) => {
+      let opArgs = {};
+      const {
+        where: { workspace_id, offset, client_id, visiblity_status, project_id, startDate, endDate, limit },
+      } = args;
+
+      let whereClause = {};
+
+      whereClause = { ...whereClause, workspace_id };
+
+      if (startDate && endDate) {
+        whereClause = { ...whereClause, startDate, endDate };
+      }
+
+      if (project_id) {
+        whereClause = { ...whereClause, project_id };
+      }
+
+      if (visiblity_status) {
+        whereClause = { ...whereClause, visiblity_status };
+      }
+
+      if (client_id) {
+        whereClause = { ...whereClause, client_id };
+      }
+
+      opArgs = {
+        limit,
+        offset,
+        where: whereClause,
+        order: [['updated_at', 'DESC']],
+      };
+      const { subtaskData, count } = await getDetailsReport(opArgs);
+      return { subtaskData, count };
+    },
+  },
+};
